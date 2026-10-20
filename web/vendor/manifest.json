@@ -1,0 +1,62 @@
+[
+  {
+    "path": "web/vendor/three.module.js",
+    "url": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+    "sha256": "ce1fa418de16a19495a9f72495580e3015d7745c296d3ce0485897f902ddedfb"
+  },
+  {
+    "path": "web/vendor/OrbitControls.js",
+    "url": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/controls/OrbitControls.js",
+    "sha256": "80efaadea4f8a636a65fb0bd08bfef62f3d93a0bb94e2e7500f23176c5c07f4e"
+  },
+  {
+    "path": "web/vendor/STLLoader.js",
+    "url": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/loaders/STLLoader.js",
+    "sha256": "a0a83c88b269c94e25b690fae770d350c4728c81853195186976be7af0f8a3b3"
+  },
+  {
+    "path": "web/vendor/THREE-LICENSE",
+    "url": "https://cdn.jsdelivr.net/npm/three@0.170.0/LICENSE",
+    "sha256": "4c40a1ef62450b857c3b2aaf294936304cd552d965fbcd9d32d4c5bcf4ba4454"
+  },
+  {
+    "path": "web/vendor/occt-import-js.js",
+    "url": "https://cdn.jsdelivr.net/npm/occt-import-js@0.0.23/dist/occt-import-js.js",
+    "sha256": "3fb44ce11d00611f9b3f3c5775d520ebab48930c1f08279b7b1316f05f0d3379"
+  },
+  {
+    "path": "web/vendor/occt-import-js.wasm",
+    "url": "https://cdn.jsdelivr.net/npm/occt-import-js@0.0.23/dist/occt-import-js.wasm",
+    "sha256": "33391fc9d94ea5c869a6718488bf0a9a464222bac9bdc764dfe1690cef281952"
+  },
+  {
+    "path": "web/vendor/OCCT-IMPORT-LICENSE.md",
+    "url": "https://cdn.jsdelivr.net/npm/occt-import-js@0.0.23/LICENSE.md",
+    "sha256": "7ffe1954587c77dfba1cf8eb9b2ea743671fa6e63f9e7a2f258119d42e14eefe"
+  },
+  {
+    "path": "lib/gson-2.11.0.jar",
+    "url": "https://repo.maven.apache.org/maven2/com/google/code/gson/gson/2.11.0/gson-2.11.0.jar",
+    "sha256": "57928d6e5a6edeb2abd3770a8f95ba44dce45f3b23b7a9dc2b309c581552a78b"
+  },
+  {
+    "path": "LEGAL/GSON-LICENSE",
+    "url": "https://raw.githubusercontent.com/google/gson/gson-parent-2.11.0/LICENSE",
+    "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  },
+  {
+    "path": "web/test-fixtures/cube.stp",
+    "url": "https://raw.githubusercontent.com/kovacsv/occt-import-js/main/test/testfiles/simple-basic-cube/cube.stp",
+    "sha256": "cfa52db7eab6fe6a73986a87aff8702d24431bdb7da6382afdd94234deb3f648"
+  },
+  {
+    "path": "web/vendor/fflate.js",
+    "url": "https://cdn.jsdelivr.net/npm/fflate@0.8.2/esm/browser.js",
+    "sha256": "8cc1f687e0159e977addb6b85e274dbd11e622cf151f4fcb7b85d49622ea43e7"
+  },
+  {
+    "path": "web/vendor/FFLATE-LICENSE",
+    "url": "https://cdn.jsdelivr.net/npm/fflate@0.8.2/LICENSE",
+    "sha256": "805f6cb28bb8b6d3a0badd83c93bccd9671fa01a3b4b92b7042b0743325ac243"
+  }
+]

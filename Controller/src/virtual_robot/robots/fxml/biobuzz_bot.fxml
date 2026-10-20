@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.Group?><?import javafx.scene.shape.*?><?import javafx.scene.text.Text?>
+<Group xmlns:fx="http://javafx.com/fxml/1" fx:controller="virtual_robot.robots.classes.BioBuzzBot">
+ <Rectangle width="75" height="75" arcWidth="7" arcHeight="7" fill="#15222e" stroke="#c5d0d3" strokeWidth="1"/>
+ <Rectangle x="12" y="3" width="5" height="69" fill="#a2b3ba"/><Rectangle x="58" y="3" width="5" height="69" fill="#a2b3ba"/>
+ <Rectangle x="12" y="67" width="51" height="5" fill="#a2b3ba"/>
+ <Rectangle x="0" y="3" width="11" height="23" arcWidth="4" arcHeight="4" fill="#20252a" stroke="#d9b456"/>
+ <Rectangle x="64" y="3" width="11" height="23" arcWidth="4" arcHeight="4" fill="#20252a" stroke="#d9b456"/>
+ <Rectangle x="0" y="49" width="11" height="23" arcWidth="4" arcHeight="4" fill="#20252a" stroke="#d9b456"/>
+ <Rectangle x="64" y="49" width="11" height="23" arcWidth="4" arcHeight="4" fill="#20252a" stroke="#d9b456"/>
+ <SVGPath stroke="#8b969c" strokeWidth="2" fill="TRANSPARENT" content="M 1 6 L 10 12 M 1 12 L 10 18 M 1 18 L 10 24 M 65 12 L 74 6 M 65 18 L 74 12 M 65 24 L 74 18 M 1 58 L 10 52 M 1 64 L 10 58 M 1 70 L 10 64 M 65 52 L 74 58 M 65 58 L 74 64 M 65 64 L 74 70"/>
+ <Rectangle x="17" y="1" width="41" height="9" arcWidth="6" arcHeight="6" fill="#a8d761" stroke="#547c31"/>
+ <SVGPath stroke="#d9ecb7" strokeWidth="2" fill="TRANSPARENT" content="M 22 1 L 22 10 M 29 1 L 29 10 M 36 1 L 36 10 M 43 1 L 43 10 M 50 1 L 50 10"/>
+ <Rectangle x="23" y="12" width="29" height="33" fill="#263039" stroke="#778d99"/>
+ <SVGPath stroke="#52616c" strokeWidth="2" fill="TRANSPARENT" content="M 24 17 L 51 17 M 24 24 L 51 24 M 24 31 L 51 31 M 24 38 L 51 38"/>
+ <Circle centerX="37.5" centerY="36" radius="10" fill="#d7ac50" stroke="#f1d18b" strokeWidth="2"/>
+ <Rectangle x="32" y="20" width="11" height="16" fill="#b9d9df" stroke="#5b7782"/>
+ <Rectangle x="21" y="48" width="22" height="12" arcWidth="3" arcHeight="3" fill="#b9563b"/>
+ <SVGPath stroke="#eece71" strokeWidth="2" fill="TRANSPARENT" content="M 28 50 L 47 45 L 48 37"/>
+ <Text x="23" y="69" text="FTC" fill="#f2f4f3" style="-fx-font-size:10px;-fx-font-weight:bold"/>
+</Group>

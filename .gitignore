@@ -1,0 +1,17 @@
+out/
+*.class
+.idea/vcs.xml
+.idea/workspace.xml
+/build/
+/import-history/
+/*-report.txt
+/packaged-smoke.txt
+
+/profiles/
+*.log
+
+# Robot code is private local data, never part of a sharing repository.
+/ImportedTeamCode/*
+!/ImportedTeamCode/.gitkeep
+/import-manifest.json
+*.zip

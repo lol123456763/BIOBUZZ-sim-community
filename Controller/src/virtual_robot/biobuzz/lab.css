@@ -1,0 +1,5 @@
+.root, .scroll-pane, .scroll-pane > .viewport { -fx-background-color: #172129; -fx-base: #26343e; -fx-control-inner-background: #111b22; -fx-font-family: 'Segoe UI'; }
+.label, .check-box { -fx-text-fill: #e0e9e7; }
+.button { -fx-background-radius: 5; -fx-padding: 7 10; -fx-text-fill: #e6eeee; }
+.combo-box, .spinner { -fx-pref-height: 29; }
+.text-area { -fx-font-family: Consolas; -fx-font-size: 11px; }
