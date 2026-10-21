@@ -1,0 +1,5 @@
+const fs=require('fs'),vm=require('vm'),path=require('path');
+const base=path.resolve(__dirname,'../web/vendor');
+const context={module:{exports:{}},require,__dirname:base,__filename:path.join(base,'occt-import-js.js'),console,process,Buffer,TextDecoder,TextEncoder,setTimeout,clearTimeout,WebAssembly,fetch};
+vm.runInNewContext(fs.readFileSync(path.join(base,'occt-import-js.js'),'utf8'),context);
+(async()=>{const engine=await context.occtimportjs({wasmBinary:fs.readFileSync(path.join(base,'occt-import-js.wasm'))});const r=engine.ReadStepFile(new Uint8Array(fs.readFileSync(process.argv[2])),{linearUnit:'meter',linearDeflectionType:'absolute_value',linearDeflection:.001,angularDeflection:.35});if(!r.success)throw Error('STEP parse failed');fs.writeFileSync('artifacts/field/meshes.json',JSON.stringify(r));console.log(JSON.stringify(r.meshes.map(m=>({name:m.name,color:m.color,vertices:m.attributes.position.array.length/3, bounds:[0,1,2].map(a=>{let lo=Infinity,hi=-Infinity;for(let i=a;i<m.attributes.position.array.length;i+=3){lo=Math.min(lo,m.attributes.position.array[i]);hi=Math.max(hi,m.attributes.position.array[i]);}return[lo,hi];})})),null,2));})();

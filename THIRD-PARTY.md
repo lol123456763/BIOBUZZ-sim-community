@@ -19,4 +19,12 @@ The v2 visuals use procedural JavaFX geometry and textures; no additional asset 
 - Gson 2.11.0 (Apache-2.0). License: LEGAL/GSON-LICENSE. Source: https://github.com/google/gson/tree/gson-parent-2.11.0 .
 - fflate 0.8.2 (MIT), for local source ZIP imports. License: web/vendor/FFLATE-LICENSE. Source: https://github.com/101arrowz/fflate/tree/v0.8.2 .
 
-Download URLs and SHA-256 hashes are in web/vendor/manifest.json. New field textures, mechanical geometry and audio tones are procedurally generated; no third-party texture pack or recorded audio is included.
+Download URLs and SHA-256 hashes are in web/vendor/manifest.json. Procedural textures and audio remain in use; official field geometry and artwork are attributed below.
+
+## Official FIRST BIOBUZZ field CAD
+
+`web/assets/field/` includes tessellated derivatives of FIRST's BIOBUZZ field STEP v26-27.2, retrieved October 20, 2026 from https://ftc-resources.firstinspires.org/ftc/archive/2027/field/field-cad-step. FIRST and the original designers retain ownership. No separate permissive CAD license is asserted. These attributed derivatives provide the simulator's educational field reference. Source hashes, conversion tolerances, exclusions and coordinates are in the asset manifest and README.
+
+`tools/vendor/meshopt_simplifier.cjs` is meshoptimizer v0.24 by Arseny Kapoulkine and contributors, MIT licensed; license in `tools/vendor/MESHOPT-LICENSE.md`. It is used offline to produce the balanced rendering mesh. Source: https://github.com/zeux/meshoptimizer/tree/v0.24.
+
+The four `apriltag-board-*.png` textures are crops of FIRST/AndyMark AprilTag Production Art V1, from https://ftc-resources.firstinspires.org/ftc/archive/2027/field/apriltag-art. They retain the original design and ownership and are display derivatives, not replacement competition print files. Measurement and cropping details are in `docs/VISION-MODEL.md`.

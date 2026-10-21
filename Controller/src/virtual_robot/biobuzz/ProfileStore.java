@@ -18,6 +18,7 @@ public final class ProfileStore {
         bound("capacity",1,12);bound("intakeCaptureTime",.01,1);bound("feedInterval",.05,3);bound("intakeRate",.1,3);
         bound("pollenMass",.005,.2);bound("nectarMass",.005,.3);bound("dragCd",0,2);bound("airDensity",.1,2);
         bound("restitution",0,.95);bound("rollingMu",0,1);bound("backspinRpm",-5000,5000);bound("magnusSlope",0,1);bound("floorImpactMu",0,1);
+        bound("cameraForward",-.8,.8);bound("cameraRight",-.8,.8);bound("cameraYaw",-180,180);bound("cameraRoll",-180,180);bound("cameraFps",1,120);
         bound("cameraHeight",.05,1);bound("cameraPitch",-80,80);bound("cameraFov",10,150);bound("visionLatency",0,.5);bound("alliance",0,1);
     }
     private static void bound(String key,double a,double b){LIMITS.put(key,new double[]{a,b});}

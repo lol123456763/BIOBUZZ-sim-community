@@ -115,6 +115,7 @@ public final class StudioServer {
         }
         BioBuzzBot bot=BioBuzzBot.current;data.put("flywheel",bot==null?0:bot.speed());data.put("intake",bot==null?0:bot.intakePower());
         data.put("motorPowers",bot==null?new double[4]:bot.drivePowers());
+        data.put("vision",bot==null?Map.of():bot.visionDiagnostics());
         data.put("wheels",bot==null?new double[4]:bot.wheelPhases.clone());data.put("phase",controller.studioPhase());
         data.put("mode",mode);data.put("remaining",Math.max(0,duration()-elapsed()));data.put("inputAge",StudioInput.ageMs());data.put("telemetry",telemetry);return data;
     }

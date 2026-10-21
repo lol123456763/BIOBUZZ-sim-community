@@ -11,6 +11,7 @@ public final class Settings {
     public double pollenMass=.026, nectarMass=.045, dragCd=.47, airDensity=1.225;
     public double restitution=.35, rollingMu=.055, spinLift=0, feedInterval=.35;
     public double cameraHeight=.305, cameraPitch=-20, cameraFov=85, visionLatency=.06;
+    public double cameraForward=0, cameraRight=0, cameraYaw=0, cameraRoll=0, cameraFps=30;
     public boolean cameraEnabled=true, frozenCamera=false;
     public int alliance=0;
     public double robotMass=13.5, gripForward=.95, gripStrafe=.72, driveDamping=.12;
@@ -34,6 +35,9 @@ public final class Settings {
             rollingMu=read(p,"floor.rolling.mu",.055,0,1);spinLift=read(p,"ball.lift.accel",0,-10,10);
             cameraHeight=read(p,"camera.height.m",.305,.05,1);cameraPitch=read(p,"camera.pitch.deg",-20,-80,80);
             visionLatency=read(p,"camera.latency.s",.06,0,.5);
+            cameraFov=read(p,"camera.fov.deg",85,10,150);cameraFps=read(p,"camera.fps",30,1,120);
+            cameraForward=read(p,"camera.forward.m",0,-.8,.8);cameraRight=read(p,"camera.right.m",0,-.8,.8);
+            cameraYaw=read(p,"camera.yaw.deg",0,-180,180);cameraRoll=read(p,"camera.roll.deg",0,-180,180);
             robotMass=read(p,"robot.mass.kg",13.5,5,30);gripForward=read(p,"drive.grip.forward",.95,.1,2);
             gripStrafe=read(p,"drive.grip.strafe",.72,.1,2);driveDamping=read(p,"drive.damping",.12,0,2);
             flywheelInertia=read(p,"flywheel.inertia.kgm2",.00012,.00001,.01);flywheelRecovery=read(p,"flywheel.recovery.s",.22,.02,1);

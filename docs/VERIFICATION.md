@@ -1,13 +1,13 @@
 # Community verification
 
-This version is tested with newly written generic examples, not competition robot source.
+Validated from a fresh tracked-file export with no imported competition programs:
 
-- Rebuild.ps1 -Test: physics, camera, mechanisms, motor/profile/input behavior, imported OpMode ownership, @Disabled filtering, helper/abstract/constructor rejection and Java source package validation.
-- tests/onbot.cjs: clean startup, OnBot source ZIP import, UTF-8 BOM, helper subpackage, disabled OpMode filtering, failed-import preservation, restart, actual TeleOp motor movement and LinearOpMode execution.
-- tests/camera.cjs: smooth driver/audience following and preserved orbit/overhead/chase.
-- tests/practice-camera.cjs: free practice camera and guided UI.
-- tests/input.cjs: standard/raw synthetic gamepad mapping.
+- 130 Java physics, vision, realism and server assertions passed.
+- 19 browser input checks and official CAD asset integrity checks passed.
+- 29 export privacy checks passed. The junction creation check was skipped by the sandbox; the exporter rejects reparse points.
+- Clean startup found zero runnable imported programs. Generic example loading, ZIP import, helper files, disabled-program filtering, invalid packages, failed-import preservation, restart, driving and autonomous movement passed.
+- Browser verification loaded official CAD offline, detected AprilTags using SharedVision, displayed live camera diagnostics, locked setup during operation, and checked desktop/mobile layouts.
 
-The privacy audit checks the public file set and archive for imported robot sources, compiled team classes, import history, profiles, source manifests and original project history. The sharing ZIP is generated from a filtered tracked file list, never a working-folder ZIP.
+The field meshes and artwork come from the official FIRST resources listed in FIELD-SOURCES.md. Collision proxies, scoring and vision remain approximations; see REALISM.md and VISION-MODEL.md. Real robot calibration is still required. Software-rendered desktop performance is limited and is not a hardware GPU benchmark.
 
-Physical hardware and arbitrary third-party/Android APIs are not covered by the generic example tests.
+The release contains generic examples and public dependencies, with required attribution. Competition programs, team branding, personal profiles, compiled imports and private repository history are excluded.

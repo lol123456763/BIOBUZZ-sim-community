@@ -277,10 +277,13 @@ public class VirtualRobotController {
                 1, VirtualField.FIELD_WIDTH_METERS);
 
         // Translate the rectangles into correct positions
-        topRect.translate(0, VirtualField.Y_MAX/VirtualField.PIXELS_PER_METER + 0.5);
-        bottomRect.translate(0, VirtualField.Y_MIN/VirtualField.PIXELS_PER_METER - 0.5);
-        leftRect.translate(VirtualField.X_MIN/VirtualField.PIXELS_PER_METER - 0.5, 0);
-        rightRect.translate(VirtualField.X_MAX/VirtualField.PIXELS_PER_METER + 0.5, 0);
+        // BIOBUZZ uses the official CAD perimeter without rescaling other games or the 2D view.
+        boolean bioBuzz=Config.GAME instanceof virtual_robot.games.BioBuzz;
+        double cadHalf=virtual_robot.biobuzz.Physics.HALF;
+        topRect.translate(0, (bioBuzz?cadHalf:VirtualField.Y_MAX/VirtualField.PIXELS_PER_METER) + 0.5);
+        bottomRect.translate(0, (bioBuzz?-cadHalf:VirtualField.Y_MIN/VirtualField.PIXELS_PER_METER) - 0.5);
+        leftRect.translate((bioBuzz?-cadHalf:VirtualField.X_MIN/VirtualField.PIXELS_PER_METER) - 0.5, 0);
+        rightRect.translate((bioBuzz?cadHalf:VirtualField.X_MAX/VirtualField.PIXELS_PER_METER) + 0.5, 0);
 
         /*
          * For each wall, create a body with infinite mass. The shape (i.e., Rectangle) for each wall is placed into
@@ -995,10 +998,12 @@ public class VirtualRobotController {
         private final double X_MIN, X_MAX, Y_MIN, Y_MAX;    //Need these to constrain field
 
         public DistanceSensorImpl(){
-            X_MIN = 2.0 * (Config.X_MIN_FRACTION - 0.5) * halfFieldWidth;
-            X_MAX = 2.0 * (Config.X_MAX_FRACTION - 0.5) * halfFieldWidth;
-            Y_MIN = 2.0 * (Config.Y_MIN_FRACTION - 0.5) * halfFieldWidth;
-            Y_MAX = 2.0 * (Config.Y_MAX_FRACTION - 0.5) * halfFieldWidth;
+            boolean bioBuzz=Config.GAME instanceof virtual_robot.games.BioBuzz;
+            double cadHalf=virtual_robot.biobuzz.Physics.HALF*VirtualField.PIXELS_PER_METER;
+            X_MIN = bioBuzz?-cadHalf:2.0 * (Config.X_MIN_FRACTION - 0.5) * halfFieldWidth;
+            X_MAX = bioBuzz?cadHalf:2.0 * (Config.X_MAX_FRACTION - 0.5) * halfFieldWidth;
+            Y_MIN = bioBuzz?-cadHalf:2.0 * (Config.Y_MIN_FRACTION - 0.5) * halfFieldWidth;
+            Y_MAX = bioBuzz?cadHalf:2.0 * (Config.Y_MAX_FRACTION - 0.5) * halfFieldWidth;
         }
 
         public synchronized double getDistance(DistanceUnit distanceUnit){
