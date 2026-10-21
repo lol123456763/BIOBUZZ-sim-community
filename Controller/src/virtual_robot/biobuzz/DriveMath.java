@@ -6,8 +6,11 @@ public final class DriveMath {
     }
     public static double[] traction(double x,double y,double torque,double mass,double lever,double muX,double muY){
         double maxX=muX*mass*Physics.G,maxY=muY*mass*Physics.G;
-        double demand=Math.hypot(x/maxX,y/maxY),scale=Math.max(1,demand);
-        return new double[]{x/scale,y/scale,Math.max(-Math.min(muX,muY)*mass*Physics.G*lever,
-            Math.min(Math.min(muX,muY)*mass*Physics.G*lever,torque))};
+        // Translation and yaw share the same floor-contact traction budget.
+        // Conservative friction ellipsoid; assumes equal static wheel loading.
+        double maxTorque=Math.min(muX,muY)*mass*Physics.G*lever;
+        double demand=Math.sqrt(x*x/(maxX*maxX)+y*y/(maxY*maxY)+torque*torque/(maxTorque*maxTorque));
+        double scale=Math.max(1,demand);
+        return new double[]{x/scale,y/scale,torque/scale};
     }
 }

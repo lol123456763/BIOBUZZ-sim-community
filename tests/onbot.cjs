@@ -13,17 +13,17 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
   await page.goto('http://127.0.0.1:8765');await page.waitForFunction(()=>document.querySelector('#connection').textContent.includes('connected'));
   assert(await page.locator('#init').isDisabled(),'Empty state cannot initialize');
   await page.locator('[data-panel="code"]').click();await page.locator('#loadExample').click();
-  await page.waitForFunction(()=>document.querySelectorAll('[data-source]').length===3);
+  await page.waitForFunction(()=>document.querySelectorAll('[data-source]').length===4);
   // Build an OnBot-shaped download ZIP in this test browser, including a BOM,
   // a helper subpackage and an annotated disabled class.
   const zip=await page.evaluate(async()=>{
    const {zipSync,strToU8}=await import('/vendor/fflate.js');const files={};
-   for(const name of ['SharedDrive.java','SharedAuto.java','DrivePower.java'])files['OnBotDownload/src/'+name]=strToU8((name==='SharedDrive.java'?'\uFEFF':'')+await fetch('/examples/onbot/'+name).then(r=>r.text()));
+   for(const name of ['SharedDrive.java','SharedAuto.java','DrivePower.java','SharedVision.java'])files['OnBotDownload/src/'+name]=strToU8((name==='SharedDrive.java'?'\uFEFF':'')+await fetch('/examples/onbot/'+name).then(r=>r.text()));
    files['OnBotDownload/src/DisabledExample.java']=strToU8('package org.firstinspires.ftc.teamcode; import com.qualcomm.robotcore.eventloop.opmode.*; @Disabled @TeleOp public class DisabledExample extends OpMode { public void init(){} public void loop(){} }');
    return Array.from(zipSync(files));
   });
   await page.locator('#javaZip').setInputFiles({name:'OnBot-source.zip',mimeType:'application/zip',buffer:Buffer.from(zip)});
-  await page.waitForFunction(()=>document.querySelectorAll('[data-source]').length===4);
+  await page.waitForFunction(()=>document.querySelectorAll('[data-source]').length===5);
   await page.locator('#compile').click();await page.waitForFunction(()=>document.querySelector('#compileLog').textContent.includes('Compiled successfully'),null,{timeout:90000});
   assert(fs.existsSync('ImportedTeamCode/org/firstinspires/ftc/teamcode/helpers/DrivePower.java'),'Helper reconstructed from package');
   const active=fs.readFileSync('build/active-build.txt','utf8');
@@ -33,7 +33,7 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
   const old=info.token;await api('restart',{});
   for(let i=0;i<80;i++){await wait(250);try{const next=await fetch('http://127.0.0.1:8765/api/info').then(r=>r.json());if(next.token!==old){info=next;break;}}catch{}}
   assert.notEqual(info.token,old,'Runner restarted');
-  assert.deepEqual(info.opModes.slice().sort(),['org.firstinspires.ftc.teamcode.SharedAuto','org.firstinspires.ftc.teamcode.SharedDrive']);
+  assert.deepEqual(info.opModes.slice().sort(),['org.firstinspires.ftc.teamcode.SharedAuto','org.firstinspires.ftc.teamcode.SharedDrive','org.firstinspires.ftc.teamcode.SharedVision']);
   await action('select',{name:'org.firstinspires.ftc.teamcode.SharedDrive'});await action('place',{x:0,y:-1,heading:0});await action('init');await action('start');
   for(let i=0;i<20;i++){await api('input',{pads:[{left_stick_y:-.5},{}]});await wait(20);}
   let state=await fetch('http://127.0.0.1:8765/api/state').then(r=>r.json());

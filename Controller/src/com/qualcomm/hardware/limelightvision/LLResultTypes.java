@@ -3,11 +3,12 @@ import java.util.*;
 import org.firstinspires.ftc.robotcore.external.navigation.*;
 public final class LLResultTypes {
     public static class FiducialResult {
-        private final int id;private final Pose3D camera,robot;private final double tx,ty;
-        public FiducialResult(int id,Pose3D camera,Pose3D robot,double tx,double ty){this.id=id;this.camera=camera;this.robot=robot;this.tx=tx;this.ty=ty;}
+        private final int id;private final Pose3D camera,robot;private final double tx,ty,area;
+        public FiducialResult(int id,Pose3D camera,Pose3D robot,double tx,double ty){this(id,camera,robot,tx,ty,0);}
+        public FiducialResult(int id,Pose3D camera,Pose3D robot,double tx,double ty,double area){this.id=id;this.camera=camera;this.robot=robot;this.tx=tx;this.ty=ty;this.area=area;}
         public int getFiducialId(){return id;}public Pose3D getTargetPoseCameraSpace(){return camera;}
         public Pose3D getTargetPoseRobotSpace(){return robot;}public double getTargetXDegrees(){return tx;}
-        public double getTargetYDegrees(){return ty;}public double getTargetArea(){return 1;}
+        public double getTargetYDegrees(){return ty;}public double getTargetArea(){return area;}
     }
     public static class ColorResult {
         private final double tx,ty,area;private final List<List<Double>> corners;

@@ -6,6 +6,8 @@ import {CameraControls} from './camera-controls.js';
 const $=id=>document.getElementById(id);
 let info,state,token='',linkMs=0,posting=false,lastState=0,settings={},sources=[],sound=null,lastShot=0,lastPhase='',lastRender=performance.now();
 const input=new Inputs(),view=new FieldView($('scene')),cad=new CadRig(view);
+function fieldCadStatus(status){if(!status)return;$('fieldCadStatus').textContent=status.label;$('fieldCadStatus').title=status.detail||'';$('fieldCadStatus').dataset.state=status.state;}
+$('scene').addEventListener('fieldcadstatus',event=>fieldCadStatus(event.detail));fieldCadStatus(view.fieldCadStatus);
 const cameraControls=new CameraControls(view,()=>settings.alliance);
 function toast(message){$('toast').textContent=message;$('toast').style.display='block';clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('toast').style.display='none',6500);}
 async function api(path,data){const response=await fetch('/api/'+path,data?{method:'POST',headers:{'Content-Type':'application/json','X-Sim-Token':token},body:JSON.stringify(data)}:{});const body=await response.json();if(!response.ok)throw Error(body.error||'Simulator request failed');return body;}
@@ -15,7 +17,7 @@ const groups={
  'Chassis & drivetrain':{robotWidth:'Width · m',robotLength:'Length · m',robotHeight:'Height · m',robotMass:'Mass · kg',driveWheelDiameter:'Wheel diameter · m',driveTrackWidth:'Wheel track width · m',driveWheelbase:'Wheelbase · m',driveRpm:'Motor free speed · RPM',driveTorque:'Motor stall torque · N·m',driveGearRatio:'External reduction',batteryVoltage:'Battery · V',brakeStrength:'BRAKE strength',coastDrag:'FLOAT motor drag',driveDamping:'Chassis damping',gripForward:'Forward grip μ',gripStrafe:'Strafe grip μ'},
  'Intake & underhand shooter':{capacity:'Ball capacity',angleDeg:'Fixed exit angle · °',exitHeight:'Exit height · m',wheelDiameter:'Flywheel diameter · m',speedFactor:'Ball speed transfer',shooterMaxTicks:'Motor limit · ticks/s',shooterTicksPerRev:'Encoder ticks / rotation',flywheelInertia:'Flywheel inertia · kg·m²',flywheelRecovery:'Spin-up time constant · s',feedInterval:'Feed interval · s',intakeCaptureTime:'Capture contact time · s',intakeRate:'Intake speed factor'},
  'Projectile & floor':{pollenMass:'Pollen mass · kg',nectarMass:'Nectar mass · kg',airDensity:'Air density · kg/m³',dragCd:'Drag coefficient',restitution:'Bounce restitution',rollingMu:'Rolling friction',floorImpactMu:'Impact friction',backspinRpm:'Ball backspin · RPM',magnusSlope:'Spin lift factor'},
- 'Camera & alliance':{cameraHeight:'Limelight height · m',cameraPitch:'Camera pitch · °',cameraFov:'Camera FOV · °',visionLatency:'Vision delay · s',alliance:'Alliance · 0 red / 1 blue'}
+ 'Camera & alliance':{cameraHeight:'Limelight height · m',cameraForward:'Mount forward · m',cameraRight:'Mount right · m',cameraPitch:'Camera pitch · °',cameraYaw:'Camera yaw · °',cameraRoll:'Camera roll · °',cameraFov:'Horizontal lens FOV · °',cameraFps:'Camera frames / second',visionLatency:'Vision delay · s',alliance:'Alliance · 0 red / 1 blue'}
 };
 function robotEditor(values){$('robotFields').replaceChildren();for(let [name,fields]of Object.entries(groups)){let d=document.createElement('details');if(name==='Chassis & drivetrain')d.open=true;let title=document.createElement('summary');title.textContent=name;d.append(title);let grid=document.createElement('div');grid.className='mapping';for(let [key,label]of Object.entries(fields)){let l=document.createElement('label');l.textContent=label;let n=document.createElement('input');n.type='number';n.step=['capacity','alliance'].includes(key)?'1':'any';n.min=info.limits[key][0];n.max=info.limits[key][1];n.value=values[key];n.dataset.setting=key;l.append(n);grid.append(l);}d.append(grid);$('robotFields').append(d);}}
 function readRobot(){let value={...settings};for(let n of document.querySelectorAll('[data-setting]')){if(!n.checkValidity()||!Number.isFinite(+n.value))throw Error('Check '+n.dataset.setting+' ('+n.min+' to '+n.max+')');value[n.dataset.setting]=+n.value;}return value;}
@@ -52,7 +54,7 @@ $('javaZip').onchange=safely(async()=>{const file=$('javaZip').files[0];if(!file
 $('addJava').onclick=safely(()=>{if(!/^[A-Za-z_$][\w$]*\.java$/.test($('javaName').value))throw Error('Use a Java class filename ending in .java');return chooseJava([...sources,new File([$('javaPaste').value],$('javaName').value)]);});
 $('javaFiles').onchange=()=>chooseJava($('javaFiles').files);$('javaFolder').onchange=()=>chooseJava($('javaFolder').files);
 $('loadExample').onclick=safely(async()=>{
- const files=await Promise.all(['SharedDrive.java','SharedAuto.java','DrivePower.java'].map(async name=>{
+ const files=await Promise.all(['SharedDrive.java','SharedAuto.java','DrivePower.java','SharedVision.java'].map(async name=>{
   const r=await fetch('examples/onbot/'+name);if(!r.ok)throw Error('Example source could not be loaded');
   return new File([await r.text()],name,{type:'text/plain'});
  }));
@@ -65,6 +67,18 @@ input.onRelease=()=>{if(token)api('input',{pads:[{},{}]}).catch(()=>{});sound?.m
 async function inputLoop(){if(token&&!posting){posting=true;const start=performance.now();try{await api('input',{pads:input.poll()});linkMs=performance.now()-start;}catch(e){$('connection').textContent='Runner disconnected';$('linkLight').classList.remove('ok');}finally{posting=false;}}setTimeout(inputLoop,4);}
 async function stateLoop(){if(token){try{state=await api('state');view.accept(state);lastState=performance.now();updateHud();}catch(e){$('event').textContent='Connection lost. Stop/reopen the Java runner to reconnect.';}}setTimeout(stateLoop,16);}
 function updateRunGuide(s){
+ for(const id of ['reset','practice','place','applyRobot','resetRobot','cadFiles','applyCad','compile','restart'])$(id).disabled=s.phase!=='stopped';
+ $('preload').disabled=s.mode!=='practice'&&s.phase!=='stopped';
+ const v=s.vision;
+ if(v&&typeof v.running==='boolean'){
+  const fresh=v.ageMs>=0&&v.ageMs<250;
+  $('visionStatus').textContent=!v.running?'Camera idle · start a vision-enabled program':!fresh?'Waiting for a fresh camera frame':v.valid?'Target detected':'Camera running · no target in view';
+  $('visionStatus').classList.toggle('ready',!!(v.running&&fresh&&v.valid));
+  $('visionPipeline').textContent=String(v.pipeline)+(v.framePipeline>=0&&v.framePipeline!==v.pipeline?' · switching…':'');
+  $('visionTarget').textContent=v.valid?(v.tagIds?.length?'AprilTag '+v.tagIds.join(', '):'Color target'):'None';
+  $('visionAngles').textContent=v.valid?`${v.tx.toFixed(1)}° / ${v.ty.toFixed(1)}°`:'—';
+  $('visionTiming').textContent=v.ageMs>=0?`${Math.round(v.ageMs)} / ${Math.round(v.latencyMs)} ms`:'No frame';
+ }
  const running=s.phase==='running',ready=s.phase==='initialized';
  $('runGuide').textContent=!info?.opModes.length?'Add an enabled team program in Programs to get started.':running?'Running. Click the field to drive, or press Esc to stop.':ready?'Robot initialized. Press Start when you are ready.':'Choose your program, then press Initialize.';
  $('runGuide').classList.toggle('ready',ready||running);

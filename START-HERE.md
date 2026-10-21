@@ -45,3 +45,13 @@ Keep competition repositories private. See docs/PRIVACY.md. This public reposito
 ## Practical limits
 
 One configurable robot, simplified field contacts and provisional scoring. No opponent simulation or complete referee scoring. Physics, synthetic vision, motor properties and mechanism dimensions require calibration. Physical controllers and each team's actual CAD/hardware still need validation.
+
+## Official field and camera diagnostics
+
+The field uses FIRST's BIOBUZZ v26-27.2 CAD and official printed AprilTag artwork. Balanced and Performance use optimized CAD; High preserves the original tessellation. Graphics settings do not change physics. See FIELD-SOURCES.md for provenance and docs/REALISM.md for collision/calibration limits.
+
+For a camera demonstration, load the generic examples in Programs, compile and restart. Select Shared Vision. While stopped, set camera pitch to 40 degrees in Robot setup > Camera & alliance and apply. Initialize and Start, then open Drive > Limelight diagnostics. At the default starting position this shows the high HIVE tags. This angle is a demo setting, not a real camera calibration. The example only reads detections and telemetry; it never drives or aims the robot.
+
+Pipeline 1 models AprilTags; pipeline 0 models yellow floor targets. Set camera mount, FOV, frame rate and latency to match your hardware. Results are geometric estimates, not actual image processing. See docs/VISION-MODEL.md.
+
+The download starts without imported programs, saved profiles, compiled robot code or import history. Use Export-Share.ps1 for redistribution; do not ZIP a live working folder.

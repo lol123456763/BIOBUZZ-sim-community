@@ -204,7 +204,9 @@ public abstract class DynamicMecanumBase extends VirtualBot {
          */
         float[] tauArray = new float[4];
         for (int i=0; i<4; i++){
-            tauArray[i] = (float)motors[i].update(millis, wSpd[i]);
+            // Encoders are upstream of the external wheel reduction.
+            double reduction=this instanceof BioBuzzBot?virtual_robot.biobuzz.Settings.S.driveGearRatio:1;
+            tauArray[i] = (float)motors[i].update(millis, wSpd[i]*reduction);
             if(this instanceof BioBuzzBot)tauArray[i]=(float)virtual_robot.biobuzz.DriveMotorModel.torque(
                 motors[i].getRawPower(),wSpd[i]*MOTOR_TYPE.MAX_RPM,
                 motors[i].getZeroPowerBehavior()==DcMotor.ZeroPowerBehavior.BRAKE,virtual_robot.biobuzz.Settings.S);

@@ -10,9 +10,9 @@ import javafx.scene.paint.Color;
 public final class BioBuzz extends Game {
     private Canvas overlay;
     public void initialize(){super.initialize();
-        // Frame is open underneath: four 1in square feet, not one solid bounding box.
+        // Official CAD Frame Foot A/B bounding rectangles; open underneath.
         for(int sx:new int[]{-1,1})for(int sy:new int[]{-1,1}){Body body=new Body();
-            org.dyn4j.geometry.Rectangle r=new org.dyn4j.geometry.Rectangle(.0254,.0254);r.translate(sx*49.46*.0254/2,sy*38.95*.0254/2);
+            org.dyn4j.geometry.Rectangle r=new org.dyn4j.geometry.Rectangle(.047290,.057929);r.translate(.00018832+sx*.602303,sy*.4657255);
             BodyFixture f=body.addFixture(r);f.setFilter(Filters.WALL_FILTER);body.setMass(MassType.INFINITE);world.addBody(body);}
         for(Physics.Flower flower:BioBuzzBot.MODEL.flowers){Body b=new Body();Circle circle=new Circle(2.5*.0254);circle.translate(flower.x,flower.y);
             b.addFixture(circle).setFilter(Filters.WALL_FILTER);b.setMass(MassType.INFINITE);world.addBody(b);}

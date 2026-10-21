@@ -46,6 +46,7 @@ public class BioBuzzBot extends DynamicMecanumBase {
         chassisBody.setLinearVelocity(0,0);chassisBody.setAngularVelocity(0);
         MODEL.robotX=chassisBody.getTransform().getTranslationX();MODEL.robotY=chassisBody.getTransform().getTranslationY();MODEL.heading=heading;
     }
+    public java.util.Map<String,Object> visionDiagnostics(){return camera==null?java.util.Map.of("running",false):camera.diagnostics();}
     public double intakePower(){return intake==null?0:intake.getPower();}
     public double speed(){return flywheel==null?0:flywheel.getVelocity();}
     public void powerDownAndReset(){super.powerDownAndReset();if(flywheel!=null)flywheel.stopAndReset();if(intake!=null)intake.stopAndReset();if(windmill!=null)windmill.stopAndReset();if(camera!=null)camera.stop();}

@@ -6,13 +6,14 @@ import java.util.*;
  * Balls use fixed substeps, quadratic drag, gravity, restitution and rolling friction.
  * HIVE shell/contact and tipping are a documented reduced-order model, not CAD rigid-body dynamics. */
 public final class Physics {
-    public static final double IN=.0254, HALF=72*IN, G=9.80665;
+    public static final double IN=.0254, HALF=1.792859, WALL_HEIGHT=.29575666, G=9.80665;
+    // Conservative wall prism follows the official CAD rail envelope, 2.26mm inside the glass.
     public final Settings cfg;
     public final List<Ball> balls=new ArrayList<>();
     public final Deque<Ball> inventory=new ArrayDeque<>();
     public final Hive[] hives={new Hive(0,-12.75*IN,-1),new Hive(1,12.75*IN,1)};
-    public final Flower[] flowers={new Flower(-24*IN,69.6*IN),new Flower(69.6*IN,24*IN),
-            new Flower(24*IN,-69.6*IN),new Flower(-69.6*IN,-24*IN)};
+    public final Flower[] flowers={new Flower(-.5942,1.7283),new Flower(1.7283,.5942),
+            new Flower(.5942,-1.7283),new Flower(-1.7283,-.5942)};
     public double time, robotX,robotY,heading,robotVx,robotVy,robotOmega,lastShot=-10,lastExitSpeed,lastShotMass;
     public int shots,hits,capacityViolations,wrongNectar;
     public String event="Ready - physics values are estimates";
@@ -57,7 +58,7 @@ public final class Physics {
     }
     public synchronized void step(double dt,double intakePower,double shooterTicks,double gate){
         if(!Double.isFinite(dt)||dt<=0)return;
-        for(double remaining=Math.min(dt,.1);remaining>1e-9;){double h=Math.min(remaining,1.0/480);substep(h,intakePower,shooterTicks,gate);remaining-=h;}
+        for(double remaining=dt;remaining>1e-9;){double h=Math.min(remaining,1.0/480);substep(h,intakePower,shooterTicks,gate);remaining-=h;}
     }
     private void substep(double dt,double intakePower,double shooterTicks,double gate){
         time+=dt;
@@ -84,7 +85,9 @@ public final class Physics {
             else if(intakePower>.1&&gate<.4&&shooterTicks>100){
                 Ball b=inventory.removeFirst();double speed=exitSpeed(shooterTicks,cfg);double a=Math.toRadians(cfg.angleDeg);
                 b.state="flight";b.x=robotX+fx*.20;b.y=robotY+fy*.20;b.z=cfg.exitHeight;
-                b.vx=fx*speed*Math.cos(a)+robotVx;b.vy=fy*speed*Math.cos(a)+robotVy;b.vz=speed*Math.sin(a);
+                // A projectile inherits velocity at the muzzle, including omega cross radius.
+                b.vx=fx*speed*Math.cos(a)+robotVx-robotOmega*(b.y-robotY);
+                b.vy=fy*speed*Math.cos(a)+robotVy+robotOmega*(b.x-robotX);b.vz=speed*Math.sin(a);
                 b.wx=rx*cfg.backspinRpm*Math.PI/30;b.wy=ry*cfg.backspinRpm*Math.PI/30;b.wz=0;
                 lastShot=time;lastExitSpeed=speed;lastShotMass=b.m;shots++;event="Underhand launch: "+String.format(java.util.Locale.US,"%.2f m/s",speed);
             }
@@ -111,18 +114,16 @@ public final class Physics {
                     }
                 }
                 if(caught)continue;
-                for(Flower f:flowers)if(pz>21.5*IN+b.r&&b.z<=21.5*IN+b.r&&b.vz<0){
-                    double t=(pz-(21.5*IN+b.r))/(pz-b.z),ix=px+(b.x-px)*t,iy=py+(b.y-py)*t;
+                for(Flower f:flowers)if(pz>.54366346+b.r&&b.z<=.54366346+b.r&&b.vz<0){
+                    double t=(pz-(.54366346+b.r))/(pz-b.z),ix=px+(b.x-px)*t,iy=py+(b.y-py)*t;
                     if(Math.hypot(ix-f.x,iy-f.y)<2*IN-b.r){b.state="flower";f.contents.add(b);caught=true;event="FLOWER entry";break;}}
                 if(caught)continue;
                 // Rim and sloping frame contacts share geometry with the visible 3D model.
                 rimContacts(b);
-                for(int sx:new int[]{-1,1})for(int sy:new int[]{-1,1})ContactMath.capsule(b,sx*24.73*IN,sy*19.475*IN,0,sx*24.73*IN,0,43.95*IN,.018,cfg.restitution);
+
                 if(b.z<=b.r){ContactMath.floorImpact(b,cfg);if(b.vz<.25){b.vz=0;b.state="floor";}}
             }else{
-                double speed=Math.hypot(b.vx,b.vy),decel=cfg.rollingMu*G*dt;
-                double factor=speed>0?Math.max(0,1-decel/speed):0;b.vx*=factor;b.vy*=factor;b.x+=b.vx*dt;b.y+=b.vy*dt;
-                b.wx=-b.vy/b.r;b.wy=b.vx/b.r;b.wz*=Math.exp(-dt*2);
+                integrateFloor(b,dt,cfg);
                 // Chassis ball contact; circle-rectangle projection, impulse from moving robot.
                 double dx=b.x-robotX,dy=b.y-robotY,r=dx*rx+dy*ry,f=dx*fx+dy*fy;
                 double hw=cfg.robotWidth/2,hl=cfg.robotLength/2;
@@ -137,13 +138,49 @@ public final class Physics {
                     double vn=(b.vx-surfaceVx)*nx+(b.vy-surfaceVy)*ny;
                     if(vn<0){b.vx-=(1+cfg.restitution)*vn*nx;b.vy-=(1+cfg.restitution)*vn*ny;}}
             }
-            // Wall height 12in: airborne balls above it leave the field.
-            if(b.z-b.r>12*IN&&(Math.abs(b.x)>HALF+b.r||Math.abs(b.y)>HALF+b.r)){b.state="out";continue;}
-            if(b.z-b.r<=12*IN){if(Math.abs(b.x)>HALF-b.r){b.x=Math.copySign(HALF-b.r,b.x);b.vx=-b.vx*cfg.restitution;}
-                if(Math.abs(b.y)>HALF-b.r){b.y=Math.copySign(HALF-b.r,b.y);b.vy=-b.vy*cfg.restitution;}}
+            frameContacts(b,cfg);
+            if(b.state.equals("floor")){
+                if(b.z>b.r+1e-6||b.vz>.25)b.state="flight";
+                else {b.z=b.r;b.vz=Math.max(0,b.vz);}
+            }
+            // CAD top-rail height: airborne balls above it leave the field.
+            if(b.z-b.r>WALL_HEIGHT&&(Math.abs(b.x)>HALF+b.r||Math.abs(b.y)>HALF+b.r)){b.state="out";continue;}
+            if(b.z-b.r<=WALL_HEIGHT){if(Math.abs(b.x)>HALF-b.r){b.x=Math.copySign(HALF-b.r,b.x);if(b.vx*b.x>0)b.vx=-b.vx*cfg.restitution;}
+                if(Math.abs(b.y)>HALF-b.r){b.y=Math.copySign(HALF-b.r,b.y);if(b.vy*b.y>0)b.vy=-b.vy*cfg.restitution;}}
         }
         for(int i=0;i<balls.size();i++){Ball a=balls.get(i);if(!free(a))continue;
             for(int j=i+1;j<balls.size();j++){Ball b=balls.get(j);if(free(b))ContactMath.spherePair(a,b,cfg.restitution);}}
+    }
+    /** Solid-sphere contact inertia matches ContactMath. Sliding transitions to rolling
+     * through a bounded Coulomb impulse instead of creating spin instantaneously. */
+    public static void integrateFloor(Ball b,double dt,Settings c){
+        double ux=b.vx-b.wy*b.r,uy=b.vy+b.wx*b.r,slip=Math.hypot(ux,uy);
+        double slideAcceleration=Math.max(0,c.floorImpactMu)*G;
+        double sliding=slip>1e-9?(slideAcceleration>0?Math.min(dt,slip/(3.5*slideAcceleration)):dt):0;
+        if(sliding>0){
+            double ax=-slideAcceleration*ux/slip,ay=-slideAcceleration*uy/slip;
+            b.x+=b.vx*sliding+.5*ax*sliding*sliding;b.y+=b.vy*sliding+.5*ay*sliding*sliding;
+            b.vx+=ax*sliding;b.vy+=ay*sliding;
+            b.wx+=2.5*ay*sliding/b.r;b.wy-=2.5*ax*sliding/b.r;
+        }
+        double remaining=dt-sliding;
+        if(remaining>0){
+            double speed=Math.hypot(b.vx,b.vy),decel=Math.max(0,c.rollingMu)*G;
+            double moving=decel>0?Math.min(remaining,speed/decel):remaining;
+            double distance=speed*moving-.5*decel*moving*moving;
+            if(speed>1e-12){b.x+=b.vx/speed*distance;b.y+=b.vy/speed*distance;
+                double factor=Math.max(0,1-decel*moving/speed);b.vx*=factor;b.vy*=factor;}
+            b.wx=-b.vy/b.r;b.wy=b.vx/b.r;
+        }
+        b.z=b.r;b.vz=0;b.wz*=Math.exp(-dt*2);
+    }
+    /** Capsule proxies fitted to official v26-27.2 A-Frame Leg and Top Bar CAD.
+     * CAD (x,y,z) maps to simulation (x,-z,y). Hardware/feet remain simplified. */
+    static void frameContacts(Ball b,Settings c){
+        for(int sx:new int[]{-1,1})for(int sy:new int[]{-1,1})
+            ContactMath.capsule(b,.00018832+sx*.60352122,sy*.47146033,.01497348,
+                .00018832+sx*.32347276,sy*.01285169,1.04208082,.018,c.restitution);
+        ContactMath.capsule(b,-.30461168,0,1.05282238,.30498832,0,1.05282238,.0127,c.restitution);
     }
     private boolean free(Ball b){return b.state.equals("floor")||b.state.equals("flight");}
     private void arrange(Hive h){int i=0;for(Ball b:h.contents){b.x=h.x+(i%3-1)*.08;b.y=h.y()-h.side*.13;b.z=h.z()-.12+(i/3)*.075;i++;}}

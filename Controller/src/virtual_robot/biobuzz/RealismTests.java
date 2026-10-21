@@ -11,7 +11,10 @@ public final class RealismTests {
         check(turn[0]==turn[1]&&turn[1]==turn[2]&&turn[2]==turn[3],"pure rotation wheel symmetry");
         double[] diagonal=DriveMath.wheels(1,1,0,.381);check(diagonal[0]==0&&diagonal[2]==0,"diagonal uses opposite wheel pair");
         double[] traction=DriveMath.traction(1000,1000,1000,13.5,.381,.7,.95);
-        near(Math.hypot(traction[0]/(.7*13.5*Physics.G),traction[1]/(.95*13.5*Physics.G)),1,1e-9,"traction stays on friction ellipse");
+        near(Math.pow(traction[0]/(.7*13.5*Physics.G),2)+Math.pow(traction[1]/(.95*13.5*Physics.G),2)+Math.pow(traction[2]/(.7*13.5*Physics.G*.381),2),1,1e-9,"translation and yaw share friction ellipsoid");
+        near(traction[0]/1000,traction[2]/1000,1e-10,"traction saturation preserves force/torque direction");
+        double[] translationOnly=DriveMath.traction(1000,1000,0,13.5,.381,.7,.95);
+        check(traction[0]<translationOnly[0],"yaw demand reduces available translation");
         check(Math.abs(traction[2])<=.7*13.5*Physics.G*.381,"yaw torque grip bound");
         Settings c=new Settings();Physics.Ball a=new Physics.Ball(-1,c),b=new Physics.Ball(-1,c);
         a.state=b.state="flight";a.x=-.025;b.x=.025;a.z=b.z=1;a.vx=1;b.vx=-1;

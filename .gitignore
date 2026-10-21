@@ -15,3 +15,5 @@ out/
 !/ImportedTeamCode/.gitkeep
 /import-manifest.json
 *.zip
+/artifacts/
+__pycache__/
